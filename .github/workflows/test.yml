@@ -7,8 +7,9 @@ jobs:
     strategy:
       matrix:
         os:
-        - ubutnu-latest
-        - macos-latest
+        # - ubutnu-latest
+        # - macos-latest
+        - windows-latest
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v4
@@ -16,4 +17,4 @@ jobs:
       with:
         # module: "github.com/actions-go/build-go-action/cmd/hello@${{ github.sha }}"
         module: "github.com/actions-go/build-go-action/cmd/hello@main"
-    - run: hello
+    - run: hello.exe

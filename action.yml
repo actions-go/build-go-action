@@ -44,3 +44,6 @@ runs:
         go install ${{ inputs.module }}
       if: steps.cache.outputs.cache-hit != 'true'
       shell: bash
+    - run: |
+        ls -al ${{ steps.compute-path.outputs.actions_go_bin }}
+      shell: bash
