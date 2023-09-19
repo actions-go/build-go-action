@@ -14,9 +14,9 @@ See [`action.yaml`](https://github.com/actions-go/go-install/blob/main/action.ym
 
 ```
 steps:
-    - uses: './'
+    - uses: 'github.com/actions-go/go-install@main'
       with:
-        module: "github.com/actions-go/build-go-action/cmd/hello@main"
+        module: "github.com/actions-go/go-install/cmd/hello@main"
 ```
 
 The action accepts fine-tuning the `go-version` input used for [`setup-go`](https://github.com/actions/setup-go) and supports all its variants [semver](https://github.com/actions/setup-go#v3), [stable](https://github.com/actions/setup-go#using-stableoldstable-aliases) and the [basic](https://github.com/actions/setup-go#basic) usage.

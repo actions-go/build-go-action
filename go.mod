@@ -1,3 +1,3 @@
-module github.com/actions-go/build-go-action
+module github.com/actions-go/go-install
 
 go 1.19
