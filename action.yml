@@ -27,15 +27,17 @@ runs:
         echo ${actions_go_bin} >> "$GITHUB_PATH"
         echo "install_path=${install_path}" >> "$GITHUB_OUTPUT"
         echo "actions_go_bin=${actions_go_bin}" >> "$GITHUB_OUTPUT"
+
+        go env 2>/dev/null | grep GOVERSION | sed -e "s,',,g" -e 's,GOVERSION=go,GOVERSION=,g' >> ${GITHUB_OUTPUT}
       shell: bash
     - name: Cache binary
       id: cache
       uses: actions/cache@v3
       with:
         path: ${{ steps.compute-path.outputs.install_path }}
-        key: ${{ inputs.module }}-${{ inputs.go-version }}
+        key: ${{ inputs.module }}-${{ steps.compute-path.outputs.GOVERSION == '' && inputs.go-version || steps.compute-path.outputs.GOVERSION }}
     - uses: actions/setup-go@v4
-      if: steps.cache.outputs.cache-hit != 'true'
+      if: ${{ steps.cache.outputs.cache-hit != 'true' && steps.compute-path.outputs.GOVERSION == '' }}
       with:
         cache: false
         go-version: ${{ inputs.go-version }}
@@ -43,4 +45,6 @@ runs:
         export GOBIN=${{ steps.compute-path.outputs.actions_go_bin }}
         go install ${{ inputs.module }}
       if: steps.cache.outputs.cache-hit != 'true'
+      shell: bash
+    - run: echo "${{ toJSON(steps.compute-path.outputs) }}"
       shell: bash
