@@ -1,0 +1,19 @@
+name: Test Action
+
+on:
+  push:
+jobs:
+  test:
+    strategy:
+      matrix:
+        os:
+        - ubutnu-latest
+        - macos-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: './'
+      with:
+        # module: "github.com/actions-go/build-go-action/cmd/hello@${{ github.sha }}"
+        module: "github.com/actions-go/build-go-action/cmd/hello@main"
+    - run: hello

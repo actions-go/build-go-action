@@ -1,0 +1,46 @@
+name: 'Go install'
+description: |
+  Builds and installs a go module to be used directly in github actions
+inputs:
+  module:
+    description: the go module to be installed
+    required: true
+  go-version:  # id of input
+    description: 'The version of Go to use'
+    required: true
+    default: '1.21'
+outputs:
+  install-path:
+    description: "The file path in which the module has been installed"
+    value: ${{ steps.compute-path.outputs.install_path }}
+  cache-hit:
+    description: "Whether the module has been installed from github cache"
+    value: ${{ steps.cache.outputs.cache-hit }}
+runs:
+  using: "composite"
+  steps:
+    - id: compute-path
+      run: |
+        actions_go_bin="${HOME}/.local/actions-go/bin"
+        install_path="${actions_go_bin}/$(echo "${{inputs.module}}" | sed -e 's,.*/\([^@]*\)\@.*,\1,g')"
+        mkdir -p "${actions_go_bin}"
+        echo ${actions_go_bin} >> "$GITHUB_PATH"
+        echo "install_path=${install_path}" >> "$GITHUB_OUTPUT"
+        echo "actions_go_bin=${actions_go_bin}" >> "$GITHUB_OUTPUT"
+      shell: bash
+    - name: Cache binary
+      id: cache
+      uses: actions/cache@v3
+      with:
+        path: ${{ steps.compute-path.outputs.install_path }}
+        key: ${{ inputs.module }}-${{ inputs.go-version }}
+    - uses: actions/setup-go@v4
+      if: steps.cache.outputs.cache-hit != 'true'
+      with:
+        cache: false
+        go-version: ${{ inputs.go-version }}
+    - run: |
+        export GOBIN=${{ steps.compute-path.outputs.actions_go_bin }}
+        go install ${{ inputs.module }}
+      if: steps.cache.outputs.cache-hit != 'true'
+      shell: bash
